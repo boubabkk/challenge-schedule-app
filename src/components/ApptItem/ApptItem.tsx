@@ -6,8 +6,11 @@ interface Props {
   appointment: IAppt,
   doctor?: IDoctor,
   patient?: IPatient,
+  cancelAppt: (appt: IAppt) => void,
+  confirmAppt: (appt: IAppt) => void,
+  completeAppt: (appt: IAppt) => void,
 }
-export default function ApptItem({ appointment, doctor, patient }: Props) {
+export default function ApptItem({ appointment, doctor, patient, cancelAppt, confirmAppt, completeAppt }: Props) {
   return (
     <div className="appt-row">
       <div className="appt-patient">
@@ -20,7 +23,15 @@ export default function ApptItem({ appointment, doctor, patient }: Props) {
       <div className="appt-info">
         <p><strong>Date: </strong>{new Date(appointment.requestedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' })}</p>
         <p><strong>Reason: </strong><br/> {appointment.requestReason}</p>
-        
+        {
+          (appointment.status === 'new' || appointment.status === 'confirmed')  &&
+          <p><strong>Action: </strong> 
+            <button onClick={() => cancelAppt(appointment)}>Cancel</button>
+            {
+              appointment.status === 'new' ? <button onClick={() => confirmAppt(appointment)}>Confirm</button> : <button onClick={() => completeAppt(appointment)}>Complete</button>
+            }
+          </p>
+        }
         {
           (appointment.status === 'completed' || appointment.status === 'cancelled')  &&
           <p>
