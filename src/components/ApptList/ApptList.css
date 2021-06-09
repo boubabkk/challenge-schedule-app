@@ -1,0 +1,3 @@
+.completed-appointment-section>.appt-row, .cancelled-appointment-section>.appt-row {
+  opacity: .5;
+}

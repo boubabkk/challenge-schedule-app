@@ -1,0 +1,19 @@
+.appt-row {
+  display: flex;
+  flex: 1;
+}
+
+.appt-patient, .appt-info, .appt-doctor {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 33%;
+}
+
+.appt-info button {
+  margin-right: .5em;
+}
+
+.patient-img, .doctor-img {
+  width: 150px;
+  height: 150px;
+}
