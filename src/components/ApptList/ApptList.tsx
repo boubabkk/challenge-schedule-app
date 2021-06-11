@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react"
 
 import './ApptList.css';
 import ApptItem from '../ApptItem';
 import {IAppt, IDoctor, IPatient} from '../../lib/types';
-import { API_ROOT } from "../../constants";
+import useAppointments from "../../hooks/useAppointments";
+import useDoctors from "../../hooks/useDoctors";
+import usePatients from "../../hooks/usePatients";
 
 interface Props {
   appointments: IAppt[],
@@ -36,75 +37,18 @@ function FilteredApptList(props: Props) {
 }
 
 export default function ApptList() {
-  //states for appointments
-  const [appointments, setAppointments] = useState<IAppt[]>([])
-  //states for doctors
-  const [doctors, setDoctors] = useState<IDoctor[]>([])
-  //states for patients
-  const [patients, setPatients] = useState<IPatient[]>([])
+  
+  const {
+    appointments, 
+    handleConfirmAppointment, 
+    handleCancelAppointment, 
+    handleCompleteAppointment
+  } = useAppointments(); 
 
-  //load list of appointments, doctors, patients on component mount
-  useEffect(() => {
-
-    fetch("/api-v1/appointments")
-      .then((res) => res.json())
-      .then((json) => {
-        setAppointments(json.appointments)
-    })
-    .catch((err: Error) => console.log(err))
-
-    fetch("/api-v1/doctors")
-      .then((res) => res.json())
-      .then((json) => {
-        setDoctors(json.doctors)
-    })
-    .catch((err: Error) => console.log(err))
-
-    fetch("/api-v1/patients")
-      .then((res) => res.json())
-      .then((json) => {
-        setPatients(json.patients)
-    })
-    .catch((err: Error) => console.log(err))
-
-  }, [])
-  //change appointment status when click cancel button
-  const handleCancelAppointment = (appointment:IAppt) => {
-    fetch(API_ROOT+"/appointments/"+appointment.id, {
-      method: 'DELETE',
-      body: JSON.stringify({reason: "Met with another doctor"}),
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        let index = appointments.findIndex((appt) => appt.id === appointment.id);
-        appointments[index].status = 'cancelled';
-        appointments[index].statusReason = 'Met with another doctor';
-        setAppointments([...appointments]);
-    })
-    .catch((err: Error) => console.log(err))
-  };
-  //change appointment status when click confirm button
-  const handleConfirmAppointment = (appointment:IAppt) => {
-    fetch(API_ROOT+"/appointments/"+appointment.id+"/confirm", {
-      method: 'POST',
-      body: JSON.stringify({doctorID: "1"}),
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        let index = appointments.findIndex((appt) => appt.id === appointment.id);
-        appointments[index].status = 'confirmed';
-        appointments[index].doctorID = "1";
-        setAppointments([...appointments]);
-    })
-    .catch((err: Error) => console.log(err))
-  };
-  //change appointment status when click complete button
-  const handleCompleteAppointment = (appointment:IAppt) => {
-    const index = appointments.findIndex((appt) => appt.id === appointment.id);
-    appointments[index].status = 'completed';
-    appointments[index].statusReason = 'completed';
-		setAppointments([...appointments]);
-  };
+  //get doctors
+  const { doctors } = useDoctors();
+  //get patients
+  const { patients } = usePatients();
 
   return (
     <>
